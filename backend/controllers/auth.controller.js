@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { createAdmin, findAdminByEmail } from "../models/admin.model.js";
+import sendToken from "../utils/sendToken.js";
+import generateToken from "../utils/generateToken.js";
 
 // Register Admin
 export const registerAdmin = async (req, res) => {
@@ -82,12 +84,7 @@ export const loginAdmin = async (req, res) => {
     const token = generateToken(admin.id);
 
     // Store Token in Cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false, // true in production (HTTPS)
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+   sendToken(res, token);
 
     return res.status(200).json({
       success: true,
