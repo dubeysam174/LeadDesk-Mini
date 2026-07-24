@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.route.js";
-
+import leadRoutes from "./routes/lead.route.js";
 const app = express();
 
 app.use(express.json());
@@ -19,5 +19,6 @@ app.use(
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/leads", leadRoutes);
 
 export default app;
