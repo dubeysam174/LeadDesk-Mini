@@ -7,7 +7,7 @@ import leadRoutes from "./routes/lead.route.js";
 import path from 'path'
 
 const app = express();
-const _dirname = path.resolve()  // it will give the path of the backend folder
+const __dirname = path.resolve()  // it will give the path of the backend folder
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -24,8 +24,8 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/leads", leadRoutes);
 
-app.use(express.static(path.join(_dirname,"/frontend/dist")))
+app.use(express.static(path.join(__dirname,"/frontend/dist")))
 app.use((_,res)=>{
-  res.sendFile(path.resolve(_dirname,"frontend","dist","index.html"))
+  res.sendFile(path.resolve(__dirname,"frontend","dist","index.html"))
 })
 export default app;
