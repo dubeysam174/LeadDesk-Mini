@@ -113,3 +113,20 @@ export const logoutAdmin = (req, res) => {
     message: "Logged out successfully",
   });
 };
+
+
+export const getCurrentAdmin = async (req, res) => {
+  try {
+    return res.status(200).json({
+      success: true,
+      admin: {
+        id: req.admin.id,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
