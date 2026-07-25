@@ -7,7 +7,7 @@ const generateToken = (adminId) => {
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: "1d",
+      expiresIn:  process.env.JWT_EXPIRES,
     }
   );
 };

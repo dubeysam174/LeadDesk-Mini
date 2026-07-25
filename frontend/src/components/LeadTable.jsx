@@ -5,7 +5,7 @@ const LeadTable = ({ leads, updateStatus }) => {
     <div className="overflow-x-auto bg-white rounded-xl shadow">
 
       <table className="w-full">
-
+      
         <thead className="sticky top-0 bg-slate-100 z-10">
 
           <tr>
