@@ -1,8 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { createAdmin, findAdminByEmail } from "../models/admin.model.js";
+import { createAdmin, findAdminByEmail, saveRefreshToken } from "../models/admin.model.js";
 import sendToken from "../utils/sendToken.js";
-import generateToken from "../utils/generateToken.js";
+import {generateAccessToken,generateRefreshToken} from '../utils/generateToken.js'
+import { getRefreshToken } from "../models/admin.model.js";
+
 
 // Register Admin
 export const registerAdmin = async (req, res) => {
@@ -80,20 +82,15 @@ export const loginAdmin = async (req, res) => {
       });
     }
 
-    // Generate JWT
-    const token = generateToken(admin.id);
+    // Generate Tokens
+    const accessToken = generateAccessToken(admin.id);
+    const refreshToken = generateRefreshToken(admin.id);
 
-    // Store Token in Cookie
-   sendToken(res, token);
+    // Save Refresh Token in DB
+    await saveRefreshToken(admin.id, refreshToken);
 
-    return res.status(200).json({
-      success: true,
-      message: "Login successful",
-      admin: {
-        id: admin.id,
-        email: admin.email,
-      },
-    });
+    // Send Response
+   return  sendToken(res, accessToken, refreshToken);
   } catch (error) {
     console.error("Login Error:", error);
 
@@ -105,13 +102,24 @@ export const loginAdmin = async (req, res) => {
 };
 
 // Logout Admin
-export const logoutAdmin = (req, res) => {
-  res.clearCookie("token");
+export const logoutAdmin = async (req, res) => {
+  try {
+    // If req.admin exists from middleware
+    await removeRefreshToken(req.admin.id);
 
-  return res.status(200).json({
-    success: true,
-    message: "Logged out successfully",
-  });
+    res.clearCookie("refreshToken");
+
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
 };
 
 
@@ -127,6 +135,48 @@ export const getCurrentAdmin = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
+    });
+  }
+};
+
+
+//refrshaccesstoken...
+export const refreshAccessToken = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token missing",
+      });
+    }
+
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+
+    const savedToken = await getRefreshToken(decoded.id);
+
+    if (savedToken !== refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid refresh token",
+      });
+    }
+
+    const accessToken = generateAccessToken(decoded.id);
+
+    return res.status(200).json({
+      success: true,
+      accessToken,
+    });
+
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: "Refresh token expired or invalid",
     });
   }
 };

@@ -2,24 +2,33 @@ import jwt from "jsonwebtoken";
 
 const isAuthenticated = (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
+    // Check if Authorization header exists
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message: "Access token missing",
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Extract token
+    const accessToken = authHeader.split(" ")[1];
 
-    req.admin = decoded;
+    // Verify Access Token
+    const decoded = jwt.verify(
+      accessToken,
+      process.env.ACCESS_TOKEN_SECRET
+    );
+
+    // Attach user info to request
+    req.user = decoded;
 
     next();
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: "Invalid Token",
+      message: "Invalid or expired access token",
     });
   }
 };

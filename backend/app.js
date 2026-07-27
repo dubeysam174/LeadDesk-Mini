@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.route.js";
 import leadRoutes from "./routes/lead.route.js";
+import userRoutes from "./routes/user.route.js"
 import path from 'path'
 
 const app = express();
@@ -23,6 +24,7 @@ app.use(
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/leads", leadRoutes);
+app.use("/api/user",userRoutes)
 
 app.use(express.static(path.join(__dirname,"/frontend/dist")))
 app.use((_,res)=>{
