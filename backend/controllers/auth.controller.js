@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { createAdmin, findAdminByEmail, saveRefreshToken } from "../models/admin.model.js";
+import { createAdmin, findAdminByEmail, saveRefreshToken,removeRefreshToken } from "../models/admin.model.js";
 import sendToken from "../utils/sendToken.js";
 import {generateAccessToken,generateRefreshToken} from '../utils/generateToken.js'
 import { getRefreshToken } from "../models/admin.model.js";

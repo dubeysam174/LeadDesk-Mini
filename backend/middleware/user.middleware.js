@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
 
-const isAuthenticated = (req, res, next) => {
+const isUserAuthenticated = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    // Check if Authorization header exists
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
@@ -12,17 +11,14 @@ const isAuthenticated = (req, res, next) => {
       });
     }
 
-    // Extract token
     const accessToken = authHeader.split(" ")[1];
 
-    // Verify Access Token
     const decoded = jwt.verify(
       accessToken,
       process.env.ACCESS_TOKEN_SECRET
     );
 
-    // Attach user info to request
-    req.admin = decoded;
+    req.user = decoded;
 
     next();
   } catch (error) {
@@ -33,4 +29,4 @@ const isAuthenticated = (req, res, next) => {
   }
 };
 
-export default isAuthenticated;
+export default isUserAuthenticated;

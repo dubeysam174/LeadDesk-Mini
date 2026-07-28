@@ -2,21 +2,21 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import API, { setAccessToken } from "../api/axios";
 
-const ProtectedRoute = ({ children }) => {
+const UserProtectedRoute = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const verifyAdmin = async () => {
+    const verifyUser = async () => {
       try {
-        // Get a new Access Token using Refresh Token
-        const { data } = await API.post("/auth/refresh");
+        // Get a new Access Token
+        const { data } = await API.post("/user/refresh");
 
         // Save the new Access Token
         setAccessToken(data.accessToken);
 
-        // Verify Admin
-        await API.get("/auth/me");
+        // Verify user
+        await API.get("/user/me");
 
         setIsAuthenticated(true);
       } catch (error) {
@@ -26,7 +26,7 @@ const ProtectedRoute = ({ children }) => {
       }
     };
 
-    verifyAdmin();
+    verifyUser();
   }, []);
 
   if (loading) {
@@ -37,7 +37,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  return isAuthenticated ? children : <Navigate to="/user/login" replace />;
 };
 
-export default ProtectedRoute;
+export default UserProtectedRoute;
